@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Rightly Dividing - KJV Bible Analysis Tool
 
 ![Rightly Dividing](https://img.shields.io/badge/Bible-KJV-blue)
@@ -165,3 +166,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ---
 
 > "Study to shew thyself approved unto God, a workman that needeth not to be ashamed, rightly dividing the word of truth." - 2 Timothy 2:15 (KJV)
+=======
+# rightly-dividing
+>>>>>>> e13688df444570cb01aaee81261cc6207877864d
