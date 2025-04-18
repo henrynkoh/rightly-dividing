@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rightly Dividing - KJV Bible Analyzer</title>
+  <style>
+    :root {
+      --primary: #1e40af;
+      --primary-light: #3b82f6;
+      --secondary: #e11d48;
+      --dark: #1e293b;
+      --light: #f8fafc;
+      --border: #e2e8f0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      color: var(--dark);
+      background-color: var(--light);
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    h1 {
+      font-size: 2.5rem;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+    h2 {
+      font-size: 1.8rem;
+      color: var(--primary);
+      margin: 1.5rem 0 1rem;
+    }
+    p {
+      margin-bottom: 1rem;
+    }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      background-color: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .input-group {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    input[type="text"], 
+    input[type="file"] {
+      flex: 1;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 0.25rem;
+      font-size: 1rem;
+    }
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 0.25rem;
+      padding: 0.75rem 1.25rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    button:hover {
+      background-color: var(--primary-light);
+    }
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1rem;
+    }
+    .tab {
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      font-weight: 500;
+    }
+    .tab.active {
+      border-bottom-color: var(--primary);
+      color: var(--primary);
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .verse-card {
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-left: 3px solid var(--primary);
+      background-color: #f8fafc;
+    }
+    .verse-ref {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .verse-text {
+      font-size: 1.1rem;
+      line-height: 1.8;
+    }
+    .highlight {
+      background-color: rgba(225, 29, 72, 0.2);
+      color: var(--secondary);
+      font-weight: 500;
+    }
+    .loader {
+      display: none;
+      text-align: center;
+      padding: 1rem;
+    }
+    .loader:after {
+      content: " ";
+      display: inline-block;
+      width: 1.5rem;
+      height: 1.5rem;
+      border: 3px solid var(--primary);
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .error {
+      color: var(--secondary);
+      background-color: rgba(225, 29, 72, 0.1);
+      padding: 0.75rem;
+      border-radius: 0.25rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .summary {
+      background-color: #f0f9ff;
+      padding: 1rem;
+      border-radius: 0.25rem;
+      margin-bottom: 1rem;
+      font-weight: 500;
+    }
+    .korean-toggle {
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Rightly Dividing the Word of Truth</h1>
+      <p>Analyze KJV Bible verses categorized by Kingdom Gospel and Grace Gospel</p>
+    </header>
+
+    <div class="card">
+      <h2>Upload KJV File</h2>
+      <p>Upload your JSON file containing KJV Bible data with categorized verses.</p>
+      <div class="input-group">
+        <input type="file" id="file-input" accept=".json">
+        <button id="upload-btn">Upload</button>
+      </div>
+      <div class="error" id="upload-error"></div>
+      <div class="loader" id="upload-loader"></div>
+    </div>
+
+    <div class="card">
+      <h2>Search KJV Bible</h2>
+      <p>Search for verses and see how they are categorized.</p>
+      <div class="input-group">
+        <input type="text" id="search-input" placeholder="Enter search term (e.g. 'gospel', 'kingdom')">
+        <button id="search-btn">Search</button>
+      </div>
+      <div class="error" id="search-error"></div>
+      <div class="loader" id="search-loader"></div>
+    </div>
+
+    <div id="results-container" style="display:none;">
+      <div class="summary" id="search-summary"></div>
+      
+      <div class="tabs">
+        <div class="tab active" data-tab="kingdom">Kingdom Gospel</div>
+        <div class="tab" data-tab="grace">Grace Gospel</div>
+      </div>
+
+      <div class="tab-content active" id="kingdom-content">
+        <div id="kingdom-verses"></div>
+      </div>
+
+      <div class="tab-content" id="grace-content">
+        <div id="grace-verses"></div>
+      </div>
+    </div>
+
+    <footer>
+      <p>&copy; 2023 Rightly Dividing - KJV Bible Analysis Tool</p>
+    </footer>
+  </div>
+
+  <script>
+    let bibleData = null;
+    
+    // DOM Elements
+    const fileInput = document.getElementById('file-input');
+    const uploadBtn = document.getElementById('upload-btn');
+    const uploadError = document.getElementById('upload-error');
+    const uploadLoader = document.getElementById('upload-loader');
+    
+    const searchInput = document.getElementById('search-input');
+    const searchBtn = document.getElementById('search-btn');
+    const searchError = document.getElementById('search-error');
+    const searchLoader = document.getElementById('search-loader');
+    const searchSummary = document.getElementById('search-summary');
+    
+    const resultsContainer = document.getElementById('results-container');
+    const kingdomVerses = document.getElementById('kingdom-verses');
+    const graceVerses = document.getElementById('grace-verses');
+    
+    // Event Listeners
+    uploadBtn.addEventListener('click', handleFileUpload);
+    searchBtn.addEventListener('click', handleSearch);
+    
+    // Tab functionality
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove active class from all tabs and content
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        // Add active class to clicked tab and corresponding content
+        tab.classList.add('active');
+        const tabName = tab.getAttribute('data-tab');
+        document.getElementById(`${tabName}-content`).classList.add('active');
+      });
+    });
+    
+    // Handle File Upload
+    function handleFileUpload() {
+      const file = fileInput.files[0];
+      
+      // Reset error
+      uploadError.style.display = 'none';
+      
+      if (!file) {
+        showError(uploadError, 'Please select a file to upload.');
+        return;
+      }
+      
+      if (file.type !== 'application/json') {
+        showError(uploadError, 'Please upload a valid JSON file.');
+        return;
+      }
+      
+      // Show loader
+      uploadLoader.style.display = 'block';
+      
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          
+          // Validate data structure (basic validation)
+          if (!data || !data.verses) {
+            throw new Error('Invalid data format. The file should contain a "verses" property.');
+          }
+          
+          bibleData = data;
+          uploadLoader.style.display = 'none';
+          alert('KJV Bible data loaded successfully!');
+          
+        } catch (error) {
+          uploadLoader.style.display = 'none';
+          showError(uploadError, 'Failed to parse JSON file: ' + error.message);
+        }
+      };
+      
+      reader.onerror = function() {
+        uploadLoader.style.display = 'none';
+        showError(uploadError, 'Error reading file.');
+      };
+      
+      reader.readAsText(file);
+    }
+    
+    // Handle Search
+    function handleSearch() {
+      const query = searchInput.value.trim();
+      
+      // Reset error
+      searchError.style.display = 'none';
+      
+      if (!query) {
+        showError(searchError, 'Please enter a search term.');
+        return;
+      }
+      
+      // Show loader
+      searchLoader.style.display = 'block';
+      resultsContainer.style.display = 'none';
+      kingdomVerses.innerHTML = '';
+      graceVerses.innerHTML = '';
+      
+      // If we have local data, use that
+      if (bibleData) {
+        processSearchResults(query, bibleData);
+        return;
+      }
+      
+      // Otherwise fetch from API
+      fetch('/api/search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query }),
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch search results');
+        }
+        return response.json();
+      })
+      .then(data => {
+        processSearchResults(query, data);
+      })
+      .catch(error => {
+        searchLoader.style.display = 'none';
+        showError(searchError, 'Error: ' + error.message);
+      });
+    }
+    
+    // Process and display search results
+    function processSearchResults(query, data) {
+      // Hide loader
+      searchLoader.style.display = 'none';
+      
+      const kingdomVersesData = data.kingdomVerses || [];
+      const graceVersesData = data.graceVerses || [];
+      const totalVerses = (kingdomVersesData.length + graceVersesData.length) || 0;
+      
+      // Update summary
+      searchSummary.innerHTML = `Found ${totalVerses} verses containing "${query}" - 
+                               ${kingdomVersesData.length} Kingdom Gospel verses and 
+                               ${graceVersesData.length} Grace Gospel verses.`;
+      
+      // Render kingdom verses
+      renderVerses(kingdomVersesData, kingdomVerses, query);
+      
+      // Render grace verses
+      renderVerses(graceVersesData, graceVerses, query);
+      
+      // Show results container
+      resultsContainer.style.display = 'block';
+    }
+    
+    // Render verses to a container
+    function renderVerses(verses, container, query) {
+      if (!verses || verses.length === 0) {
+        container.innerHTML = '<p>No verses found in this category.</p>';
+        return;
+      }
+      
+      const fragmentHtml = verses.map(verse => {
+        const highlightedText = highlightText(verse.text, query);
+        
+        return `
+        <div class="verse-card">
+          <div class="verse-ref">${verse.reference}</div>
+          <div class="verse-text">${highlightedText}</div>
+          ${verse.koreanText ? `
+          <div class="korean-toggle">
+            <input type="checkbox" id="korean-${verse.reference.replace(/\s+/g, '-')}" class="korean-checkbox">
+            <label for="korean-${verse.reference.replace(/\s+/g, '-')}">Show Korean</label>
+            <div class="korean-text" style="display:none;">${verse.koreanText}</div>
+          </div>` : ''}
+        </div>`;
+      }).join('');
+      
+      container.innerHTML = fragmentHtml;
+      
+      // Add event listeners for Korean toggles
+      container.querySelectorAll('.korean-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          const koreanText = this.parentElement.querySelector('.korean-text');
+          koreanText.style.display = this.checked ? 'block' : 'none';
+        });
+      });
+    }
+    
+    // Highlight search term in text
+    function highlightText(text, query) {
+      if (!query || !text) return text;
+      
+      const regex = new RegExp(`(${escapeRegExp(query)})`, 'gi');
+      return text.replace(regex, '<span class="highlight">$1</span>');
+    }
+    
+    // Helper to escape regex special characters
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+    
+    // Show error message
+    function showError(element, message) {
+      element.textContent = message;
+      element.style.display = 'block';
+      
+      // Hide error after 5 seconds
+      setTimeout(() => {
+        element.style.display = 'none';
+      }, 5000);
+    }
+  </script>
+</body>
+</html> 

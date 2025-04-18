@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 245, 245, 247;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-start-rgb));
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 입력 필드 스타일 개선 */
+input[type="text"] {
+  color: #000 !important;
+  background-color: #fff !important;
+  border: 2px solid #4a5568 !important;
+  font-size: 1rem !important;
+}
+
+input[type="text"]::placeholder {
+  color: #718096 !important;
+  opacity: 1 !important;
+}
+
+/* 테이블 헤더 스타일 개선 */
+table thead th {
+  color: white !important;
+  font-weight: 700 !important;
+  font-size: 1.1rem !important;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5) !important;
+  padding: 0.75rem 1rem !important;
+}
+
+table thead tr {
+  background-color: #4a5568 !important;
+  border-radius: 8px 8px 0 0 !important;
+}
+
+/* Red text colors for highlighting */
+.text-red-600 {
+  color: rgb(220, 38, 38);
+}
+
+.text-red-500 {
+  color: rgb(239, 68, 68);
+}
+
+/* Essential utility classes */
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+} 
